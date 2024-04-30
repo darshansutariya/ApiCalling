@@ -18,8 +18,15 @@ interface APIService {
     @POST("auth/signup")
     fun signup(@Body signUpRequest: SignUpRequest): Observable<SignUpResponse>
 
+    @Multipart
+@POST("initiate")
+@Headers({
+        "Content-Type: application/json",
+        "Cache-Control: no-cache"
+})
+Call<UserInfoServerResponse> getUserInfoRequest(@Part(value="data") UserInfo mUserInfo);
 
-    // MediaUpload
+    // MediaUploadl̥
     @Multipart
     @POST("common/mediaUpload")
     fun mediaUpload(
