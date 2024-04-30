@@ -57,3 +57,30 @@ fun signUpAPI() {
             )
         }
     }
+
+
+
+
+class ArtistsAdapter(val context: Context,val artistList : ArrayList<EventDetailResponse.Data.Artist>) : RecyclerView.Adapter<ArtistsAdapter.ViewHolder>() {
+
+    class ViewHolder(val b: ArtistsAdapterBinding) : RecyclerView.ViewHolder(b.root)
+    
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        return ViewHolder(ArtistsAdapterBinding.inflate(LayoutInflater.from(context), parent, false))
+    }
+
+    override fun getItemCount(): Int {
+        return artistList.size
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val data = artistList[position]
+
+        holder.b.txtArtistsName.text = data.eventArtistName
+
+        Glide.with(context)
+            .load(data.eventArtistImageUrl)
+            .placeholder(R.drawable.place_holder)
+            .centerCrop()
+            .into(holder.b.userImg)
+    }
