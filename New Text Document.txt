@@ -1,0 +1,59 @@
+//RxJava
+    implementation 'io.reactivex.rxjava3:rxjava:3.0.6'
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+
+    //Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava3:2.9.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2'
+    
+    // Okhttp3 for the POST requests
+    implementation 'com.squareup.okhttp3:okhttp-urlconnection:3.12.1'
+    
+    // Gson (To convert raw JSON to pretty JSON)
+    implementation 'com.google.code.gson:gson:2.9.1'
+
+
+fun signUpAPI() {
+        if (utils.isNetworkAvailable()) {
+            utils.showProgress()
+
+            val signUpRequest = SignUpRequest(
+                SignUpRequest.Data(
+                    Const.langType,
+                    binding.etMobile.text.toString().trim().replace(" ", "")
+                )
+            )
+
+            compositeDisposable.add(
+                apiService.signup(signUpRequest).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread()).subscribe({
+                        utils.dismissProgress()
+                        when (it.status) {
+                            "3" -> {
+                                startActivity(
+                                    Intent(activity, VerificationActivity::class.java)
+                                        .putExtra(
+                                            VerificationActivity.PHONE,
+                                            it.data.loginKey
+                                        )
+                                )
+                            }
+                            "0" -> {
+                                binding.tvErrorMsg.text = it.message
+                                binding.etMobile.setBackgroundResource(R.drawable.edittext_red_back)
+                                binding.tvErrorMsg.visibility = View.VISIBLE
+                            }
+
+                            else -> {
+                                checkStatus(it.status, it.message)
+                            }
+                        }
+                    }, {
+                        utils.dismissProgress()
+                        errorToast(getString(R.string.serverNotResponding))
+                    })
+            )
+        }
+    }
